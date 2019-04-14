@@ -1,0 +1,19 @@
+Assignment 4 Real-time text classification in the browser
+Jing Qian (jq2282)
+
+Comparisons of RNN-based approach with baseline (DNN) approach:
+In the plot above, I compare the performance of the two approaches through showing the training accuracy, validation accuracy, training loss and validation loss.
+
+We could see from the plot:
+
+1) Both RNN and DNN get validation accuracy above 80% after 2-3 epochs, which is good.
+2) DNN had better training accuracy and validation accuracy than RNN in every epoch.
+3) The accuracy difference between these two models decreased with the increasing epochs.
+4) Both DNN and RNN became overfit after around 2 epochs.
+Also, DNN run faster than RNN, which could be seen from the training record. Morever, I changed embedding_size from 8 to 32, which improved the RNN's validation accuracy.
+
+In all, DNN works better in the dataset than RNN-based approach. There might be two reasons for the result:
+1) The training set is not large enough.
+2) The differences between the four books may not be so obvious, and random sampled sentences may lead to randomly predicting errors, which preventing higher accuracy.
+
+The url is https://fakeJQ.github.io/applied-dl/hw4/.
