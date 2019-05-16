@@ -4,7 +4,7 @@
 
 现在产生了91和84各200个图(之后如果产生，就是改1.3里面slide_id, generate_train,再run save)
 
-但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。试试，如果train from scrach 能行，就认定image和model应该没什么错。
+但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。试试，如果train from scratch 能行，就认定image和model应该没什么错。确认了，train from scratch能行。
 
 test写好之后。写multi-scale. 再加个level2的。
 
