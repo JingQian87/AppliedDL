@@ -1,5 +1,7 @@
 ### NOTE OF PROJECT-ADL
 
+05/17凌晨：思考下怎么兼容的处理，重跑training image, 这回应该快得多。带到model里。再对应的改testing. 再predict.
+
 
 
 * （需要重新产生training image, 取更大的tumor checking region）现在产生了91和84各200个图(之后如果产生，就是改1.3里面slide_id, generate_train,再run save)
@@ -7,6 +9,7 @@
 * 但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。train from scratch也行。
 
 * （先按错的training image train 的model给test）决定取level3作为high resolution, level4作为lower resolution. 取level3上的128*128 作为checking tumor region, 这样level4上就是predict 299\*299 patches 中心的64\*64区域的label。那么在level 7上对应的就是8\*8个pixel. 另外，testing时也切掉周边的10%。
+* 之后还要记得保存model哟！！！
 
 test写好之后。写multi-scale. 再加个level2的。
 
