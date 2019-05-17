@@ -2,9 +2,11 @@
 
 
 
-现在产生了91和84各200个图(之后如果产生，就是改1.3里面slide_id, generate_train,再run save)
+* （需要重新产生training image, 取更大的tumor checking region）现在产生了91和84各200个图(之后如果产生，就是改1.3里面slide_id, generate_train,再run save)
 
-但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。试试，如果train from scratch 能行，就认定image和model应该没什么错。确认了，train from scratch能行。
+* 但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。train from scratch也行。
+
+* （先按错的training image train 的model给test）决定取level3作为high resolution, level4作为lower resolution. 取level3上的128*128 作为checking tumor region, 这样level4上就是predict 299\*299 patches 中心的64\*64区域的label。那么在level 7上对应的就是8\*8个pixel. 另外，testing时也切掉周边的10%。
 
 test写好之后。写multi-scale. 再加个level2的。
 
@@ -41,6 +43,18 @@ test写好之后。写multi-scale. 再加个level2的。
 **2. Test的处理**
 
 I found the number 128\*128 center pixels (in level 0) to check whether tumor inside any patch is meaningful. I guess they choose 128\*128 (in level 0) because it is 1\*1 pixel in level 7. So whatever level you are using, your predicted region is one pixel in level 7. To make the predictions on level 7 continuous, we need to slide windows on the specific level we are training on. Take level 4 as example, 1\*1 pixel in level 7 corresponds to 8\*8 in level 4. So every input 299\*299 on level 4 gives prediction of center 8\*8 (~1\*1 in level 7 ~ 128\*128 in level 0). Then we stride with step 8 to give prediction of next 8\*8 in level 4 (so next pixel in level 7). There is no averaging here if we don't use data augmentation or multi-scale.
+
+现在的问题是，如果level7每个pixel都要test，比如110slide的level 7 是736*560， 那就相当于350000个testing image, 即使我只删选出tissue area(又增加麻烦)，也还有将近1000000个。决定采用Amal的建议，选取更大的checking region.
+
+决定取level3作为high resolution, level4作为lower resolution. 取level3上的128*128 作为checking tumor region, 这样level4上就是predict 299\*299 patches 中心的64\*64区域的label。那么在level 7上对应的就是8\*8个pixel. 另外，testing时也切掉周边的10%。
+
+并且发现[`feature_extraction.image.extract_patches_2d`]可以取patches，但是不能有stride.所以自己loop 写。
+
+所以步骤：
+
+1. 读取level4, 只取10%开始。
+2. 做nested loop，stride 64. 10%边长+64n恰好过一点点90%边长结束。两边都是这样。生成testing image 扔进drive.
+3. 导进model predict.
 
 **3. 对于multi-scale的思考**
 
