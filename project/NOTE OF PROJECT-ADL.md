@@ -1,21 +1,11 @@
 ### NOTE OF PROJECT-ADL
 
-05/17凌晨：思考下怎么兼容的处理，重跑training image, 这回应该快得多。带到model里。再对应的改testing. 再predict.
+* 没有办法用pickle dump model, 与程序矛盾。查别的办法？
 
+* sample label 1 class 太慢了，可以直接从tumor pixel中sample么
 
-
-* （需要重新产生training image, 取更大的tumor checking region）现在产生了91和84各200个图(之后如果产生，就是改1.3里面slide_id, generate_train,再run save)
-
-* 但是当下重点是写test. 首先，transfer learning在400个图上貌似能看。但是好像每次跑的都不一样，泪奔。train from scratch也行。
-
-* （先按错的training image train 的model给test）决定取level3作为high resolution, level4作为lower resolution. 取level3上的128*128 作为checking tumor region, 这样level4上就是predict 299\*299 patches 中心的64\*64区域的label。那么在level 7上对应的就是8\*8个pixel. 另外，testing时也切掉周边的10%。
-* 之后还要记得保存model哟！！！
-
-test写好之后。写multi-scale. 再加个level2的。
-
-
-
-
+* 决定取level3作为high resolution, level4作为lower resolution. 取level3上的128*128 作为checking tumor region, 这样level4上就是predict 299\*299 patches 中心的64\*64区域的label。那么在level 7上对应的就是8\*8个pixel. 另外，testing时也切掉周边的10%。
+* 思考一下，发现把tumor check region 从128@lev0改成128@lev3之后，取出的patches对应的center region变大了。如果training是用sliding而不是random sample,很可能都没有多少label 1的training data. 而为了balance class, 从一张slide上提取出的数据也会很少。这也支持了我们采用random sample而非sliding window 在training中。
 
 **0. 整体思路**
 
@@ -60,6 +50,18 @@ I found the number 128\*128 center pixels (in level 0) to check whether tumor in
 3. 导进model predict.
 
 **3. 对于multi-scale的思考**
+
+fully connect: 再加一层dense layer，把每个小模型的输出concatenate当作input . 整体train，因为每个小模型本身就是pretrained.
+
+考虑到每个通过logits再连的，应该是include_top=True?
+
+看https://github.com/flyyufelix/cnn_finetune/blob/master/inception_v3.py 
+
+也有merge的layer
+
+https://stackoverflow.com/questions/51091553/how-to-merge-2-simillar-inception-models-with-identical-input-in-keras
+
+
 
 
 
